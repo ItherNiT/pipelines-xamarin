@@ -1,42 +1,15 @@
-# Xamarin.Android and Xamarin.iOS
+
 # Build a Xamarin.Android and Xamarin.iOS app.
 # Add steps that test, sign, and distribute the app, save build artifacts, and more:
 # https://docs.microsoft.com/en-us/azure/devops/pipelines/ecosystems/xamarin
 
 jobs:
-
-- job: Android
-  pool:
-    vmImage: 'windows-2019'
-
-  variables:
-    buildConfiguration: 'Release'
-    outputDirectory: '$(build.binariesDirectory)/$(buildConfiguration)'
-
-  steps:
-  - task: NuGetToolInstaller@1
-
-  - task: NuGetCommand@2
-    inputs:
-      restoreSolution: '**/*.sln'
-
-  - task: XamarinAndroid@1
-    inputs:
-      projectFile: '**/*droid*.csproj'
-      outputDirectory: '$(outputDirectory)'
-      configuration: '$(buildConfiguration)'
-      msbuildVersionOption: '16.0'
-
-  - task: AndroidSigning@3
-    inputs:
-      apksign: false
-      zipalign: false
-      apkFiles: '$(outputDirectory)/*.apk'
-
-  - task: PublishBuildArtifacts@1
-    inputs:
-      pathtoPublish: '$(outputDirectory)'
-
+# Xamarin.Android and Xamarin.iOS
+- task: InstallAppleCertificate@2
+  inputs:
+    certSecureFile: 'appleDevCert.p12'
+    certPwd: 'Sappi123.'
+    keychain: 'temp'
 - job: iOS
   pool:
     vmImage: 'macOS-11'
@@ -58,5 +31,8 @@ jobs:
     inputs:
       solutionFile: '**/*.sln'
       configuration: 'Release'
+      clean: true
+      packageApp: true
       buildForSimulator: true
-      packageApp: false
+      runNugetRestore: true
+
